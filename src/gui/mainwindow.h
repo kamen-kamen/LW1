@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QInputDialog>
-#include <QTimer>
 #include <ui_mainwindow.h>
 
 #include "../shape/abstractshape.h"
@@ -19,7 +18,6 @@ public:
     ~MainWindow();
 
 private slots:
-    // Кнопки создания
     void on_btnAddRect_clicked();
     void on_btnAddTriangle_clicked();
     void on_btnAddCircle_clicked();
@@ -33,25 +31,14 @@ private slots:
 
     void on_btnAddCart_clicked();
 
-    // void startQuickMove(double tx, double ty);
-    // void on_btnUp_clicked();
-    // void on_btnDown_clicked();
-    // void on_btnLeft_clicked();
-    // void on_btnRight_clicked();
-    //
-    // void keyPressEvent(QKeyEvent *event);
-
-    // Кнопки анимации
     void on_btnMove_clicked();
     void on_btnRotate_clicked();
     void on_btnScale_clicked();
 
     void on_btnDelete_clicked();
-    
-    // Слот таймера
+
     void processStep();
-    
-    // Слот от Канвы
+
     void onShapeSelected(AbstractShape* s);
 
 private:

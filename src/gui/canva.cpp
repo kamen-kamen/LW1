@@ -71,7 +71,7 @@ void Canva::moveLoop() {
     if (selectedShapes.isEmpty() || pressedKeys.isEmpty()) return;
 
     double dx = 0, dy = 0;
-    double step = 5.0;
+    double step = 2.0;
 
     if (pressedKeys.contains(Qt::Key_W)) dy -= step;
     if (pressedKeys.contains(Qt::Key_S)) dy += step;

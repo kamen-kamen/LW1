@@ -22,7 +22,7 @@ public:
 
     void draw(QPainter *p) override {
         p->drawPolygon(points);
-        p->drawEllipse(m_center, 1, 1); // Рисуем точку центра для наглядности
+        p->drawEllipse(m_center, 1, 1);
     }
 
     void move(double dx, double dy) override {
@@ -64,7 +64,7 @@ public:
         double p = 0;
         for (int i = 0; i < points.size(); ++i) {
             QPointF p1 = points[i];
-            QPointF p2 = points[(i + 1) % points.size()]; // Замыкаем последнюю с первой
+            QPointF p2 = points[(i + 1) % points.size()];
             double dx = p2.x() - p1.x();
             double dy = p2.y() - p1.y();
             p += std::sqrt(dx*dx + dy*dy);
@@ -72,7 +72,6 @@ public:
         return p;
     }
 
-    // --- РЕАЛИЗАЦИЯ ПЛОЩАДИ (МЕТОД ТРИАНГУЛЯЦИИ / ГАУССА) ---
     double area() const override {
         if (points.size() < 3) return 0;
         double a = 0;
@@ -102,7 +101,6 @@ public:
 class TriangleShape : public PolygonShape {
 public:
     TriangleShape(QPointF c, double size) : PolygonShape(c) {
-        // Равносторонний треугольник
         double h = size * sqrt(3) / 2;
         points << QPointF(c.x(), c.y() - 2*h/3)
                << QPointF(c.x() - size/2, c.y() + h/3)
@@ -122,9 +120,7 @@ public:
     }
     void move(double dx, double dy) override { m_center += QPointF(dx, dy); }
     
-    void rotate(double, QPointF pivot) override { 
-        // Круг вращается вокруг своего центра визуально никак,
-        // но если pivot внешний - надо смещать центр (сделай по аналогии с Polygon если надо)
+    void rotate(double, QPointF pivot) override {
     } 
     
     void scale(double factor, QPointF) override { radius *= factor; }
@@ -188,7 +184,6 @@ class LShape : public PolygonShape {
 public:
     LShape(QPointF c, double size) : PolygonShape(c) {
         double s = size / 2.0;
-        // Рисуем "сапожок" относительно центра
         points << QPointF(c.x() - s,   c.y() - s)   // Левый верх
                << QPointF(c.x() - s/3, c.y() - s)   // Внутренний угол
                << QPointF(c.x() - s/3, c.y() + s/3) // Внутренний сгиб
@@ -204,17 +199,14 @@ public:
 class CartShape : public RectShape {
 public:
     CartShape(QPointF c, double w, double h) : RectShape(c, w, h) {
-        // Точки кузова (0-3) уже добавлены конструктором RectShape
 
-        // Добавляем точки ГРУЗА (4-7) поверх кузова
-        double cargoW = w * 0.5; // Груз чуть уже телеги
-        double cargoH = h * 0.6; // Высота груза
+        double cargoW = w * 0.5;
+        double cargoH = h * 0.6;
 
-        // Считаем координаты относительно центра
-        points << QPointF(c.x() - cargoW/2, c.y() - h/2 - cargoH) // 4: левый верх груза
-               << QPointF(c.x() + cargoW/2, c.y() - h/2 - cargoH) // 5: правый верх
-               << QPointF(c.x() + cargoW/2, c.y() - h/2)          // 6: правый низ
-               << QPointF(c.x() - cargoW/2, c.y() - h/2);         // 7: левый низ
+        points << QPointF(c.x() - cargoW/2, c.y() - h/2 - cargoH)
+               << QPointF(c.x() + cargoW/2, c.y() - h/2 - cargoH)
+               << QPointF(c.x() + cargoW/2, c.y() - h/2)
+               << QPointF(c.x() - cargoW/2, c.y() - h/2);
     }
 
     QString getName() const override { return "Тележка"; }
@@ -222,25 +214,21 @@ public:
     void draw(QPainter *p) override {
         p->setRenderHint(QPainter::Antialiasing);
 
-        // 1. Рисуем КУЗОВ (первые 4 точки)
         p->setBrush(QBrush(Qt::darkCyan));
         QVector<QPointF> bodyPoints = {points[0], points[1], points[2], points[3]};
         p->drawPolygon(bodyPoints);
 
-        // 2. Рисуем ГРУЗ (следующие 4 точки)
-        // Теперь они будут крутиться и масштабироваться, так как лежат в points
         p->setBrush(QBrush(Qt::green));
         QVector<QPointF> cargoPoints = {points[4], points[5], points[6], points[7]};
         p->drawPolygon(cargoPoints);
 
-        // 3. Рисуем КОЛЕСА
         p->setBrush(Qt::black);
-        // Чтобы колеса тоже увеличивались, считаем их радиус от текущего размера кузова
+
         double wheelR = std::sqrt(std::pow(points[0].x() - points[1].x(), 2) +
                                   std::pow(points[0].y() - points[1].y(), 2)) * 0.1;
 
-        p->drawEllipse(points[3], wheelR, wheelR); // Левое колесо
-        p->drawEllipse(points[2], wheelR, wheelR); // Правое колесо
+        p->drawEllipse(points[3], wheelR, wheelR);
+        p->drawEllipse(points[2], wheelR, wheelR);
     }
 };
 
