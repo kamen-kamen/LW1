@@ -2,8 +2,10 @@
 #define CANVA_H
 
 #include <QFrame>
-#include <QList>
 #include <QMouseEvent>
+#include <QKeyEvent>
+#include <QTimer>
+#include <QSet>
 #include "../shape/abstractshape.h"
 
 class Canva : public QFrame {
@@ -11,17 +13,25 @@ class Canva : public QFrame {
 public:
     explicit Canva(QWidget *parent = nullptr);
     ~Canva();
-
     void addShape(AbstractShape* s);
-
-    QList<AbstractShape*> selectedShapes; // Список всех выделенных фигур
-    QList<AbstractShape*> shapes;         // Все фигуры на холсте
+    QList<AbstractShape*> shapes;
+    QList<AbstractShape*> selectedShapes;
 
     signals:
-        void shapeSelected(AbstractShape* s); // Сигнал в MainWindow
+        void shapeSelected(AbstractShape* s);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override; // Клик
+    void mousePressEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
+private slots:
+    void moveLoop();
+
+private:
+    QTimer *moveTimer;
+    QSet<int> pressedKeys;
 };
+
 #endif
